@@ -19,7 +19,9 @@ public class DBUtils {
             // if connection is not open yet, open new connection
             String jdbcLink = ConfigReader.getProperty("jdbcLink")
                     //set database name for jdbc driver.
-                    .replace("<db>", db);
+                    .replace("<db>", db)
+                    .replace("<user>", System.getenv("DbUser"))
+                    .replace("<password>", System.getenv("DbPassword"));
             try {
                 connection = DriverManager.getConnection(jdbcLink);
                 statement = connection.createStatement();

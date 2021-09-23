@@ -16,7 +16,11 @@ public class DBUtilsV2 {
             // if connection is not open yet, open new connection
             String jdbcLink = ConfigReader.getProperty("jdbcLink")
                     //set database name for jdbc driver.
-                    .replace("<db>", db);
+                    .replace("<db>", db)
+                    // set username in jdbc link
+                    .replace("<user>", System.getenv("DbUser"))
+                    // set password in jdbc link
+                    .replace("<password>", System.getenv("DbPassword"));
             try {
                 connection = DriverManager.getConnection(jdbcLink);
                 statement = connection.createStatement();
@@ -37,13 +41,14 @@ public class DBUtilsV2 {
      * String name = "new account";
      * int id = 1;
      * query(q, name, id);
-     *
      */
 
     // Varargs
     public static ResultSetHandler query(String query, Object... params) {
         if (connection == null) openConnection();
         try {
+            if(params.length == 0)
+                return new ResultSetHandler(statement.executeQuery(query));
             // Prepared statement requires a query in order to be created
             PreparedStatement preparedStatement
                     = connection.prepareStatement(query);
@@ -60,6 +65,17 @@ public class DBUtilsV2 {
             return null;
         }
     }
+
+    public boolean executeStatement(String query) {
+        try {
+            return statement.execute(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Assert.fail(e.getMessage());
+        }
+        return false;
+    }
+
 
     // closing connection method
     public static void close() {

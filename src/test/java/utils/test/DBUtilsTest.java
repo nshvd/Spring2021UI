@@ -25,18 +25,6 @@ public class DBUtilsTest {
     public final String queryToGetAccountStanding =
             "SELECT * FROM account_standing;";
 
-    public final String queryToGetCustomerAccounts =
-            "SELECT T1.account_number AS accountNumber," +
-                    " T1.current_balance AS currentBalance," +
-                    " T3.username," +
-                    " T4.first_name AS firstName," +
-                    " T4.last_name AS lastName\n" +
-                    "FROM account T1\n" +
-                    "LEFT JOIN users T3\n" +
-                    "ON T1.owner_id = T3.id\n" +
-                    "LEFT JOIN user_profile T4\n" +
-                    "ON profile_id = T4.id";
-
     @Test
     public void queryTest() {
         DBUtils.openConnection();
@@ -96,15 +84,18 @@ public class DBUtilsTest {
 
     @Test
     public void testCustAcc() {
-        List<UserAccount> userAccounts =
-                DBUtilsV2.query(queryToGetCustomerAccounts)
-                        .getBeans(UserAccount.class);
-
+        List<UserAccount> userAccounts = UserAccount.getFromDB();
         System.out.println(userAccounts);
         System.out.println();
         for (UserAccount userAccount : userAccounts) {
             System.out.println(userAccount);
+            System.out.println(userAccount.calculateInterest());
         }
     }
 
+    @Test
+    public void testCustAcc1() {
+        UserAccount userAccount = UserAccount.getFromDB("486130001");
+        System.out.println(userAccount);
+    }
 }
